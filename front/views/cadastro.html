@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Usuário</title>
+    <link rel="stylesheet" type="text/css" href="/assets/css/login.css">
+</head>
+<body>
+    <div class="background-image"></div>
+    <div class="container-login">
+        <div class="form-box">
+            <div class="form">
+                <h2>Crie a sua conta!</h2>
+                <form id="formulario-cadastro"> 
+                    <div class="input-box">
+                        <input type="text" name="nick" id="nick" placeholder="Escolha um nick" required="required">
+                        <input type="text" name="nome" id="nome" placeholder="Digite o seu nome" required="required">
+                        <input type="email" name="email" id="email" placeholder="Digite o seu e-mail" required="required">
+                        <input type="password" name="senha" id="senha" placeholder="Digite a sua senha" required="required">
+                        <input type="password" name="confirmar-senha" id="confirmacao" placeholder="Confirme a sua senha" required="required">
+                        <div id="senha-match-feedback"></div> 
+                    </div>
+                    <div class="group">
+                        <a href="/login">Clique aqui para fazer o login</a>
+                    </div>
+                    <button type="submit" class="btn-instadev">Cadastrar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/cadastro.js"></script>
+</body>
+</html>
