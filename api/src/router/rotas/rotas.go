@@ -8,12 +8,13 @@ import (
 )
 
 type Rota struct {
-	URI                  string
-	Metodo               string
-	Funcao               func(http.ResponseWriter, *http.Request)
-	RequerAutentificacao bool
+	URI                string
+	Metodo             string
+	Funcao             func(http.ResponseWriter, *http.Request)
+	RequerAutenticacao bool
 }
 
+// Configurar coloca todas as rotas dentro do router
 func Configurar(r *mux.Router) *mux.Router {
 	rotas := rotasUsuarios
 	rotas = append(rotas, rotaLogin)
@@ -21,7 +22,7 @@ func Configurar(r *mux.Router) *mux.Router {
 
 	for _, rota := range rotas {
 
-		if rota.RequerAutentificacao {
+		if rota.RequerAutenticacao {
 			r.HandleFunc(rota.URI,
 				middlewares.Logger(middlewares.Autenticar(rota.Funcao)),
 			).Methods(rota.Metodo)
@@ -30,5 +31,6 @@ func Configurar(r *mux.Router) *mux.Router {
 		}
 
 	}
+
 	return r
 }

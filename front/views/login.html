@@ -15,18 +15,22 @@
         <div class="form-box">
             <div class="form">
                 <h2>Registro</h2>
-                <div class="input-box">
-                    <input class="inputbox" type="text" name="email" id="email" placeholder="Digite o seu e-mail" required="required">
-                    <input type="password" name="senha" id="senha" placeholder="Digite a sua senha" required="required">
-                </div>
-                <div class="group">
-                    <a href="/create-user">Ainda não tem conta? Clique aqui!</a>
-                </div>
-                <button type="submit" class="btn-instadev">Login</button>
+                <form id="login" method="POST">
+                    <div class="input-box">
+                        <input class="inputbox" type="text" name="email" id="email" placeholder="Digite o seu e-mail" required="required">
+                        <input type="password" name="senha" id="senha" placeholder="Digite a sua senha" required="required">
+                    </div>
+                    <div class="group">
+                        <a href="/criar-usuario">Ainda não tem conta? Clique aqui!</a>
+                    </div>          
+                    <button type="submit" class="btn-instadev">Login</button>
+                </form> 
+                   
             </div>
         </div>
     </div>
-
+    <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/login.js"></script>
 </body>
 
 </html>

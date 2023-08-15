@@ -43,18 +43,32 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
-	usuario.ID, erro = repositorio.Criar(usuario)
-	if erro != nil {
+	usuarioSelect, erroSelect := repositorio.BuscarPorEmail(usuario.Email)
+
+	if erroSelect != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
 
-	respostas.JSON(w, http.StatusCreated, usuario)
+	if usuarioSelect.ID != 0 {
+		respostas.JSON(w, http.StatusConflict, "Usuário já existente")
+		return
+	} else {
+		usuario.ID, erro = repositorio.Criar(usuario)
+		if erro != nil {
+			respostas.Erro(w, http.StatusInternalServerError, erro)
+			return
+		} else {
+			respostas.JSON(w, http.StatusCreated, usuario)
+		}
+
+	}
+
 }
 
+// BuscarUsuarios busca todos os usuários salvos no banco
 func BuscarUsuarios(w http.ResponseWriter, r *http.Request) {
 	nomeOuNick := strings.ToLower(r.URL.Query().Get("usuario"))
-
 	db, erro := banco.Conectar()
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
@@ -68,9 +82,11 @@ func BuscarUsuarios(w http.ResponseWriter, r *http.Request) {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
+
 	respostas.JSON(w, http.StatusOK, usuarios)
 }
 
+// BuscarUsuario busca um usuário salvo no banco
 func BuscarUsuario(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 
@@ -97,11 +113,23 @@ func BuscarUsuario(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusOK, usuario)
 }
 
+// AtualizarUsuario altera as informações de um usuário no banco
 func AtualizarUsuario(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
 	if erro != nil {
 		respostas.Erro(w, http.StatusBadRequest, erro)
+		return
+	}
+
+	usuarioIDNoToken, erro := autenticacao.ExtrairUsuarioID(r)
+	if erro != nil {
+		respostas.Erro(w, http.StatusUnauthorized, erro)
+		return
+	}
+
+	if usuarioID != usuarioIDNoToken {
+		respostas.Erro(w, http.StatusForbidden, errors.New("Não é possível atualizar um usuário que não seja o seu"))
 		return
 	}
 
@@ -127,7 +155,6 @@ func AtualizarUsuario(w http.ResponseWriter, r *http.Request) {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
-
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
@@ -139,6 +166,7 @@ func AtualizarUsuario(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusNoContent, nil)
 }
 
+// DeletarUsuario exclui as informações de um usuário no banco
 func DeletarUsuario(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
@@ -154,7 +182,7 @@ func DeletarUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if usuarioID != usuarioIDNoToken {
-		respostas.Erro(w, http.StatusForbidden, errors.New("não é possível deletar um usuário que não seja o seu"))
+		respostas.Erro(w, http.StatusForbidden, errors.New("Não é possível deletar um usuário que não seja o seu"))
 		return
 	}
 
@@ -174,6 +202,7 @@ func DeletarUsuario(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusNoContent, nil)
 }
 
+// SeguirUsuario permite que um usuário siga outro
 func SeguirUsuario(w http.ResponseWriter, r *http.Request) {
 	seguidorID, erro := autenticacao.ExtrairUsuarioID(r)
 	if erro != nil {
@@ -189,7 +218,7 @@ func SeguirUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if seguidorID == usuarioID {
-		respostas.Erro(w, http.StatusForbidden, errors.New("não é possível seguir você mesmo"))
+		respostas.Erro(w, http.StatusForbidden, errors.New("Não é possível seguir você mesmo"))
 		return
 	}
 
@@ -209,7 +238,8 @@ func SeguirUsuario(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusNoContent, nil)
 }
 
-func ParardeSeguirUsuario(w http.ResponseWriter, r *http.Request) {
+// PararDeSeguirUsuario permite que um usuário pare de seguir outro
+func PararDeSeguirUsuario(w http.ResponseWriter, r *http.Request) {
 	seguidorID, erro := autenticacao.ExtrairUsuarioID(r)
 	if erro != nil {
 		respostas.Erro(w, http.StatusUnauthorized, erro)
@@ -224,7 +254,7 @@ func ParardeSeguirUsuario(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if seguidorID == usuarioID {
-		respostas.Erro(w, http.StatusUnauthorized, errors.New("a senha atual não condiz com a que está salva no banco"))
+		respostas.Erro(w, http.StatusForbidden, errors.New("Não é possível parar de seguir você mesmo"))
 		return
 	}
 
@@ -244,6 +274,7 @@ func ParardeSeguirUsuario(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusNoContent, nil)
 }
 
+// BuscarSeguidores traz todos os seguidores de um usuário
 func BuscarSeguidores(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
@@ -269,6 +300,7 @@ func BuscarSeguidores(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusOK, seguidores)
 }
 
+// BuscarSeguindo traz todos os usuários que um determinado usuário está seguindo
 func BuscarSeguindo(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
@@ -294,6 +326,7 @@ func BuscarSeguindo(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusOK, usuarios)
 }
 
+// AtualizarSenha permite alterar a senha de um usuário
 func AtualizarSenha(w http.ResponseWriter, r *http.Request) {
 	usuarioIDNoToken, erro := autenticacao.ExtrairUsuarioID(r)
 	if erro != nil {
@@ -309,18 +342,18 @@ func AtualizarSenha(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if usuarioIDNoToken != usuarioID {
-		respostas.Erro(w, http.StatusForbidden, errors.New("não é possível atualizar a senha de um usuário que não seja o seu"))
+		respostas.Erro(w, http.StatusForbidden, errors.New("Não é possível atualizar a senha de um usuário que não seja o seu"))
 		return
 	}
 
-	corpoRequisicao, _ := io.ReadAll(r.Body)
+	corpoRequisicao, erro := io.ReadAll(r.Body)
 	var senha modelos.Senha
-	if err := json.Unmarshal(corpoRequisicao, &senha); err != nil {
-		respostas.Erro(w, http.StatusBadRequest, err)
+	if erro = json.Unmarshal(corpoRequisicao, &senha); erro != nil {
+		respostas.Erro(w, http.StatusBadRequest, erro)
 		return
 	}
 
-	db, erro := banco.Conectar() // Conectar novamente ao banco de dados
+	db, erro := banco.Conectar()
 	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
@@ -335,7 +368,7 @@ func AtualizarSenha(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if erro = seguranca.VerificarSenha(senhaSalvaNoBanco, senha.Atual); erro != nil {
-		respostas.Erro(w, http.StatusUnauthorized, errors.New("a senha atual não condiz com a que está salva no banco"))
+		respostas.Erro(w, http.StatusUnauthorized, errors.New("A senha atual não condiz com a que está salva no banco"))
 		return
 	}
 

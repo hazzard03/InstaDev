@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// gerar router das rotas configuradas
+// Gerar vai retornar um router com as rotas configuradas
 func Gerar() *mux.Router {
 	r := mux.NewRouter()
 	return rotas.Configurar(r)
