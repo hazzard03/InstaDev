@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -59,6 +58,7 @@ func CriarPublicacao(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusCreated, publicacao)
 }
 
+// BuscarPublicacoes traz as publicações que apareceriam no feed do usuário
 func BuscarPublicacoes(w http.ResponseWriter, r *http.Request) {
 	usuarioID, erro := autenticacao.ExtrairUsuarioID(r)
 	if erro != nil {
@@ -83,6 +83,7 @@ func BuscarPublicacoes(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusOK, publicacoes)
 }
 
+// BuscarPublicacao traz uma única publicação
 func BuscarPublicacao(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 	publicacaoID, erro := strconv.ParseUint(parametros["publicacaoId"], 10, 64)
@@ -108,6 +109,7 @@ func BuscarPublicacao(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusOK, publicacao)
 }
 
+// AtualizarPublicacao altera os dados de uma publicação
 func AtualizarPublicacao(w http.ResponseWriter, r *http.Request) {
 	usuarioID, erro := autenticacao.ExtrairUsuarioID(r)
 	if erro != nil {
@@ -141,7 +143,7 @@ func AtualizarPublicacao(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	corpoRequisicao, erro := ioutil.ReadAll(r.Body)
+	corpoRequisicao, erro := io.ReadAll(r.Body)
 	if erro != nil {
 		respostas.Erro(w, http.StatusUnprocessableEntity, erro)
 		return
@@ -166,6 +168,7 @@ func AtualizarPublicacao(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusNoContent, nil)
 }
 
+// DeletarPublicacao exclui os dados de uma publicação
 func DeletarPublicacao(w http.ResponseWriter, r *http.Request) {
 	usuarioID, erro := autenticacao.ExtrairUsuarioID(r)
 	if erro != nil {
@@ -207,6 +210,7 @@ func DeletarPublicacao(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusNoContent, nil)
 }
 
+// BuscarPublicacoesPorUsuario traz todas as publicações de um usuário específico
 func BuscarPublicacoesPorUsuario(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 	usuarioID, erro := strconv.ParseUint(parametros["usuarioId"], 10, 64)
@@ -232,6 +236,7 @@ func BuscarPublicacoesPorUsuario(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusOK, publicacoes)
 }
 
+// CurtirPublicacao adiciona uma curtida na publicação
 func CurtirPublicacao(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 	publicacaoID, erro := strconv.ParseUint(parametros["publicacaoId"], 10, 64)
@@ -256,6 +261,7 @@ func CurtirPublicacao(w http.ResponseWriter, r *http.Request) {
 	respostas.JSON(w, http.StatusNoContent, nil)
 }
 
+// DescurtirPublicacao subtrai uma curtida na publicação
 func DescurtirPublicacao(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 	publicacaoID, erro := strconv.ParseUint(parametros["publicacaoId"], 10, 64)

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Usuário</title>
     <link rel="stylesheet" type="text/css" href="/assets/css/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div class="background-image"></div>
@@ -12,7 +13,7 @@
         <div class="form-box">
             <div class="form">
                 <h2>Crie a sua conta!</h2>
-                <form id="formulario-cadastro"> 
+                <form id="formulario-cadastro" method="POST"> 
                     <div class="input-box">
                         <input type="text" name="nick" id="nick" placeholder="Escolha um nick" required="required">
                         <input type="text" name="nome" id="nome" placeholder="Digite o seu nome" required="required">

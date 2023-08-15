@@ -5,19 +5,21 @@ import (
 	"database/sql"
 )
 
+// Publicacoes representa um repositório de publicações
 type Publicacoes struct {
 	db *sql.DB
 }
 
+// NovoRepositorioDePublicacoes cria um repositório de publicações
 func NovoRepositorioDePublicacoes(db *sql.DB) *Publicacoes {
 	return &Publicacoes{db}
 }
 
+// Criar insere uma publicação no banco de dados
 func (repositorio Publicacoes) Criar(publicacao modelos.Publicacao) (uint64, error) {
 	statement, erro := repositorio.db.Prepare(
 		"insert into publicacoes (titulo, conteudo, autor_id) values (?, ?, ?)",
 	)
-
 	if erro != nil {
 		return 0, erro
 	}
@@ -36,6 +38,7 @@ func (repositorio Publicacoes) Criar(publicacao modelos.Publicacao) (uint64, err
 	return uint64(ultimoIDInserido), nil
 }
 
+// BuscarPorID traz uma única publicação do banco de dados
 func (repositorio Publicacoes) BuscarPorID(publicacaoID uint64) (modelos.Publicacao, error) {
 	linha, erro := repositorio.db.Query(`
 	select p.*, u.nick from 
@@ -67,6 +70,7 @@ func (repositorio Publicacoes) BuscarPorID(publicacaoID uint64) (modelos.Publica
 	return publicacao, nil
 }
 
+// Buscar traz as publicações dos usuários seguidos e também do próprio usuário que fez a requisição
 func (repositorio Publicacoes) Buscar(usuarioID uint64) ([]modelos.Publicacao, error) {
 	linhas, erro := repositorio.db.Query(`
 	select distinct p.*, u.nick from publicacoes p 
@@ -104,6 +108,7 @@ func (repositorio Publicacoes) Buscar(usuarioID uint64) ([]modelos.Publicacao, e
 	return publicacoes, nil
 }
 
+// Atualizar altera os dados de uma publicação no banco de dados
 func (repositorio Publicacoes) Atualizar(publicacaoID uint64, publicacao modelos.Publicacao) error {
 	statement, erro := repositorio.db.Prepare("update publicacoes set titulo = ?, conteudo = ? where id = ?")
 	if erro != nil {
@@ -118,6 +123,7 @@ func (repositorio Publicacoes) Atualizar(publicacaoID uint64, publicacao modelos
 	return nil
 }
 
+// Deletar exclui uma publicação do banco de dados
 func (repositorio Publicacoes) Deletar(publicacaoID uint64) error {
 	statement, erro := repositorio.db.Prepare("delete from publicacoes where id = ?")
 	if erro != nil {
@@ -132,6 +138,7 @@ func (repositorio Publicacoes) Deletar(publicacaoID uint64) error {
 	return nil
 }
 
+// BuscarPorUsuario traz todas as publicações de um usuário específico
 func (repositorio Publicacoes) BuscarPorUsuario(usuarioID uint64) ([]modelos.Publicacao, error) {
 	linhas, erro := repositorio.db.Query(`
 		select p.*, u.nick from publicacoes p
@@ -167,6 +174,7 @@ func (repositorio Publicacoes) BuscarPorUsuario(usuarioID uint64) ([]modelos.Pub
 	return publicacoes, nil
 }
 
+// Curtir adiciona uma curtida na publicação
 func (repositorio Publicacoes) Curtir(publicacaoID uint64) error {
 	statement, erro := repositorio.db.Prepare("update publicacoes set curtidas = curtidas + 1 where id = ?")
 	if erro != nil {
@@ -181,6 +189,7 @@ func (repositorio Publicacoes) Curtir(publicacaoID uint64) error {
 	return nil
 }
 
+// Descurtir subtrai uma curtida na publicação
 func (repositorio Publicacoes) Descurtir(publicacaoID uint64) error {
 	statement, erro := repositorio.db.Prepare(`
 		update publicacoes set curtidas = 

@@ -19,4 +19,5 @@ func Conectar() (*sql.DB, error) {
 	}
 
 	return db, nil
+
 }

@@ -16,6 +16,7 @@ type Publicacao struct {
 	CriadaEm  time.Time `json:"criadaEm,omitempty"`
 }
 
+// Preparar vai chamar os métodos para validar e formatar a publicação recebida
 func (publicacao *Publicacao) Preparar() error {
 	if erro := publicacao.validar(); erro != nil {
 		return erro
@@ -27,11 +28,11 @@ func (publicacao *Publicacao) Preparar() error {
 
 func (publicacao *Publicacao) validar() error {
 	if publicacao.Titulo == "" {
-		return errors.New("o título é obrigatório e não pode estar em branco")
+		return errors.New("O título é obrigatório e não pode estar em branco")
 	}
 
 	if publicacao.Conteudo == "" {
-		return errors.New("o conteúdo é obrigatório e não pode estar em branco")
+		return errors.New("O conteúdo é obrigatório e não pode estar em branco")
 	}
 
 	return nil

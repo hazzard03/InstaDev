@@ -8,15 +8,13 @@ import (
 	"api/src/respostas"
 	"api/src/seguranca"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 )
 
-// Login é responsável por autenticar um usuário na API
 func Login(w http.ResponseWriter, r *http.Request) {
 	corpoRequisicao, erro := io.ReadAll(r.Body)
-
 	if erro != nil {
 		respostas.Erro(w, http.StatusUnprocessableEntity, erro)
 		return
@@ -36,11 +34,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
-	fmt.Print(usuario.Email)
 	usuarioSalvoNoBanco, erro := repositorio.BuscarPorEmail(usuario.Email)
-	fmt.Print(erro)
 	if erro != nil {
-		fmt.Print("teste")
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
@@ -56,6 +51,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte(token))
+	usuarioID := strconv.FormatUint(usuarioSalvoNoBanco.ID, 10)
 
+	respostas.JSON(w, http.StatusOK, modelos.DadosAutenticacao{ID: usuarioID, Token: token})
 }
