@@ -43,27 +43,13 @@ func CriarUsuario(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repositorio := repositorios.NovoRepositorioDeUsuarios(db)
-	usuarioSelect, erroSelect := repositorio.BuscarPorEmail(usuario.Email)
-
-	if erroSelect != nil {
+	usuario.ID, erro = repositorio.Criar(usuario)
+	if erro != nil {
 		respostas.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
 
-	if usuarioSelect.ID != 0 {
-		respostas.JSON(w, http.StatusConflict, "Usuário já existente")
-		return
-	} else {
-		usuario.ID, erro = repositorio.Criar(usuario)
-		if erro != nil {
-			respostas.Erro(w, http.StatusInternalServerError, erro)
-			return
-		} else {
-			respostas.JSON(w, http.StatusCreated, usuario)
-		}
-
-	}
-
+	respostas.JSON(w, http.StatusCreated, usuario)
 }
 
 // BuscarUsuarios busca todos os usuários salvos no banco
