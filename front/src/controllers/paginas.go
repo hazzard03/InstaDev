@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"front/src/config"
+	"front/src/cookies"
 	"front/src/modelos"
 	"front/src/requisicoes"
 	"front/src/respostas"
 	"front/src/utils"
 	"net/http"
+	"strconv"
 )
 
 func CarregarTelaDeLogin(w http.ResponseWriter, r *http.Request) {
@@ -39,5 +41,15 @@ func CarregarPaginaPrincipal(w http.ResponseWriter, r *http.Request) {
 		respostas.JSON(w, http.StatusUnprocessableEntity, respostas.ErroAPI{Erro: erro.Error()})
 		return
 	}
-	utils.ExecutarTemplate(w, "home.html", publicacoes)
+
+	cookie, _ := cookies.Ler(r)
+	usuarioID, _ := strconv.ParseUint(cookie["id"], 10, 64)
+
+	utils.ExecutarTemplate(w, "home.html", struct {
+		Publicacoes []modelos.Publicacao
+		UsuarioID   uint64
+	}{
+		Publicacoes: publicacoes,
+		UsuarioID:   usuarioID,
+	})
 }
