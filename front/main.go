@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"front/src/config"
+	"front/src/cookies"
 	"front/src/router"
 	"front/src/utils"
 	"log"
@@ -11,6 +12,7 @@ import (
 
 func main() {
 	config.Carregar()
+	cookies.Configurar()
 	utils.CarregarTemplates()
 	r := router.Gerar()
 
