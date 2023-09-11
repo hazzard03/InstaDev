@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InstaDev - Login</title>
     <link rel="stylesheet" type="text/css" href="/assets/css/login.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>      
 </head>
 
 <body>
@@ -15,10 +15,10 @@
         <div class="form-box">
             <div class="form">
                 <h2>Registro</h2>
-                <form id="login" method="POST">
+                <form id="login" method="POST" onsubmit="return false;">
                     <div class="input-box">
-                        <input class="inputbox" type="text" name="email" id="email" placeholder="Digite o seu e-mail" required="required">
-                        <input type="password" name="senha" id="senha" placeholder="Digite a sua senha" required="required">
+                        <input class="inputbox" type="text" name="email" id="email" placeholder="Digite o seu e-mail" required="required" autocomplete="email">
+                        <input type="password" name="senha" id="senha" placeholder="Digite a sua senha" required="required" autocomplete="current-password">
                     </div>
                     <div class="group">
                         <a href="/criar-usuario">Ainda não tem conta? Clique aqui!</a>

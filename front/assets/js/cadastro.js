@@ -34,8 +34,5 @@ $('#formulario-cadastro').on("submit", function(event) {
         }).fail(function() {
             Swal.fire("Ops...", "Erro ao cadastrar o usuário!", "error");
         });
-    }
-
-    
-   
+    }  
 });

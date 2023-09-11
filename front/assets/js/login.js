@@ -16,10 +16,9 @@ $('#login').on("submit", function(event) {
             senha: senha,
         }
     }).done(function() {
-        alert("Login com Sucesso")
+        Swal.fire("Sucesso!", "Usuário logado com sucesso!", "success")
         window.location = "/home";
     }).fail(function() {
-        alert("Erro");
-        Swal.fire("Ops...", "Usuário ou senha incorretos!", "error");
+        Swal.fire("Ops...", "Erro ao autenticar o usuário!", "error");
     });
 });
