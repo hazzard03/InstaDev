@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -72,6 +73,8 @@ func BuscarPublicacoes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer db.Close()
+
+	log.Printf("UsuarioID na função BuscarPublicacoes - Controller: %d", usuarioID)
 
 	repositorio := repositorios.NovoRepositorioDePublicacoes(db)
 	publicacoes, erro := repositorio.Buscar(usuarioID)

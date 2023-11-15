@@ -2,6 +2,7 @@ package cookies
 
 import (
 	"front/src/config"
+	"log"
 	"net/http"
 	"time"
 
@@ -32,6 +33,8 @@ func Salvar(w http.ResponseWriter, ID, token string) error {
 		HttpOnly: true,
 	})
 
+	log.Printf("Dados de autenticação salvos no cookie - ID: %s. Token: %s", ID, token)
+
 	return nil
 }
 
@@ -45,6 +48,8 @@ func Ler(r *http.Request) (map[string]string, error) {
 	if erro = s.Decode("dados", cookie.Value, &valores); erro != nil {
 		return nil, erro
 	}
+
+	log.Printf("Dados de autenticação obtidos no cookie - ID: %s. Token: %s", valores["id"], valores["token"])
 
 	return valores, nil
 }

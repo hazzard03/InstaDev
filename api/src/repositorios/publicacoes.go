@@ -3,6 +3,7 @@ package repositorios
 import (
 	"api/src/modelos"
 	"database/sql"
+	"log"
 )
 
 // Publicacoes representa um repositório de publicações
@@ -72,6 +73,9 @@ func (repositorio Publicacoes) BuscarPorID(publicacaoID uint64) (modelos.Publica
 
 // Buscar traz as publicações dos usuários seguidos e também do próprio usuário que fez a requisição
 func (repositorio Publicacoes) Buscar(usuarioID uint64) ([]modelos.Publicacao, error) {
+
+	log.Printf("UsuarioID na função Buscar - Repositório: %d", usuarioID)
+
 	linhas, erro := repositorio.db.Query(`
 	select distinct p.*, u.nick from publicacoes p 
 	inner join usuarios u on u.id = p.autor_id 
